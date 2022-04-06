@@ -1,18 +1,19 @@
 <HTML>
     <BODY>
-        <H1>{{value}}</H1>
+        <H1>{{name}}</H1>
         <form method="GET">
         <label for="unicode">Unicode:</label>
         <input type="text" id="unicode" name="unicode">
         <input type="submit" value="SUBMIT">
         </form>
-        <h2>Locations in Avatar</h2>
+
+        <form method=POST>
+        <input type="text" id="newScript" name="newScript">
+
+        <h2>{{name}}</h2>
             <ul style="width:80%; padding: 1em;border:1px;border-color:#0000;border-style:solid; background-color: rgb(206, 212, 224, 0.5);">
-                {% for l in location %}
-                    <li><b>{l['name']}</a></b></li>
-                    <ul>
-                        <li>{{l['description']}}</li>
-                    </ul>
+                {% for s in scripts %}
+                    <li><b><a href={{url_for('script', scr=s['name'])}}>{{s['name']}}</a></b></li>
                 {% endfor %}
             </ul>
     </BODY>

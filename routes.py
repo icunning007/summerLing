@@ -270,8 +270,10 @@ def scriptEdit():
     #for make changes portion
     else:
         name = request.form['Name']                 #gets script name
+        print("NAME="+str(name))
         for key, val in request.form.items():
-            print("KEY" + key)
+            print("KEY=" + key)
+            print("VAL=" + val)
             if "_" in key:                          #splits on the _ because it's the value that changes
                 sp = key.split("_")
                 key = sp[0]
@@ -281,9 +283,9 @@ def scriptEdit():
                 if count==0:                                    #if it doesn't exist (0) then update it
                     db.collections.update_one({"Name":name}, {"$pull":{ key : oldVal}})
                     db.collections.update_one({"Name":name}, {"$push": {key : val}})
+            elif "Name" not in key:
+                db.collections.update_one({"Name":name}, {"$push": {key : val}})
 
-
-        
         mongo_client.close()                                    #closes database
         
         return redirect(url_for("scriptEdit",scr=name, msg=f"{name} updated successfully!"))

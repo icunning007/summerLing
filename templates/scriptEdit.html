@@ -61,6 +61,7 @@
     
     <tr><td>Name</td>
     <td>{{scripts["Name"]}}</td></tr>
+    <input type="hidden" id="Name" name="Name" value="{{scripts['Name']}}"/>
 <!--    
     <tr><td>Script Type</td>
         {% if "scriptType" in dic.keys() %}
@@ -118,11 +119,11 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="direction" rows="1" 
+                <textarea type="text" style="width: 423px;" id="direction_{{dic['direction']}}" rows="1" 
                     name="direction_{{dic['direction']}}" value="{{dic['direction']}}"/>{{v}}</textarea>
             </td>
             <td>
-                <a href={{url_for("scriptEdit", val=dic["direction"], delValue="direction", valueName=dic.Name)}} 
+                <a href={{url_for("scriptEdit", val=v, delValue="direction", valueName=scripts["Name"])}} 
                     onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
             </td></tr>
             {% endfor %}{% endfor %}

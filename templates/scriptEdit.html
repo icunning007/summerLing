@@ -61,7 +61,7 @@
     
     <tr><td>Name</td>
     <td>{{scripts["Name"]}}</td></tr>
-    
+<!--    
     <tr><td>Script Type</td>
         {% if "scriptType" in dic.keys() %}
         <td>
@@ -71,9 +71,7 @@
             <tr>
             <td>
                 <textarea type="text" style="width: 423px;" id="scriptType" rows="1" 
-                    name="scriptType_{{dic['scriptType']}}" value="{{dic['scriptType']}}"/>
-                    {{v}}
-                </textarea>
+                    name="scriptType_{{dic['scriptType']}}" value="{{dic['scriptType']}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=dic["scriptType"], delValue="scriptType", valueName=dic.Name)}} 
@@ -88,7 +86,6 @@
         </td>
         {% endif %}
     
-
     <tr><td>Script Family</td>
         {% if "scriptFamily" in dic.keys() %}
         <td>
@@ -98,9 +95,7 @@
             <tr>
             <td>
                 <textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" 
-                    name="scriptFamily_{{dic['scriptFamily']}}" value="{{dic['scriptFamily']}}"/>
-                    {{v}}
-                </textarea>
+                    name="scriptFamily_{{dic['scriptFamily']}}" value="{{dic['scriptFamily']}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=dic["scriptFamily"], delValue="scriptFamily", valueName=dic.Name)}} 
@@ -114,14 +109,31 @@
             <textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily"></textarea>
         </td>
         {% endif %}
+-->
+    <tr><td>Direction</td>
+        {% if "direction" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['direction'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="direction" rows="1" 
+                    name="direction_{{dic['direction']}}" value="{{dic['direction']}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=dic["direction"], delValue="direction", valueName=dic.Name)}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="direction" rows="1" name="direction"></textarea>
+        </td>
+        {% endif %}
 
-    <tr><td>Script Family</td>
-    {% if "scriptFamily" in dic.keys() %}
-    <td><textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily_{{dic['scriptFamily']}}" value="{{dic['scriptFamily']}}"/>{{dic['scriptFamily']}}</textarea></td>
-    <td><a href={{url_for("scriptEdit", val=dic["scriptFamily"], delValue="scriptFamily", valueName=dic.Name)}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td>
-    {% else %}
-    <td><textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily"></textarea></td>
-    {% endif %}
 
     <tr><td>Hyperlinks</td>
         {% if "Hyperlinks" in dic.keys() %}
@@ -132,9 +144,7 @@
             <tr>
             <td>
                 <textarea type="text" style="width: 423px;" id="Hyperlinks" rows="1" 
-                    name="Hyperlinks_{{dic['Hyperlinks']}}" value="{{dic['Hyperlinks']}}"/>
-                    {{v}}
-                </textarea>
+                    name="Hyperlinks_{{dic['Hyperlinks']}}" value="{{dic['Hyperlinks']}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=dic["Hyperlinks"], delValue="Hyperlinks", valueName=dic.Name)}} 
@@ -150,6 +160,7 @@
         {% endif %}
 
     </table>
+    <input type="submit" value="Make changes!" />
     </form>
 
 

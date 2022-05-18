@@ -82,6 +82,10 @@ def scriptEdit():
         val = request.args['val']
         #mash = str(key) + "." + str(val)
         db.collections.update_one({"Name":name}, {"$pull":{ key : val}})
+        count = db.collections.count_documents({"Name": name, key : {"$size" : 0}})
+        if count == 1:
+            db.collections.update_one({"Name":name}, {"$unset":{key : ""}})
+
         mongo_client.close()
         return redirect(url_for("scriptEdit",scr=name, msg=f"{val} deleted from {name} successfully!"))
     #code to delete entire key
@@ -178,7 +182,7 @@ def scriptEdit():
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
         key=request.form['listkey']                 #gets key name
-        key = key.title()                           #makes the key title case
+        #key = key.title()                           #makes the key title case
         val=request.form['listvalue']               #gets value
         name=request.form['Name']                   #gets name of script
         #checks if script exists or not
@@ -278,8 +282,6 @@ def scriptEdit():
                     db.collections.update_one({"Name":name}, {"$pull":{ key : oldVal}})
                     db.collections.update_one({"Name":name}, {"$push": {key : val}})
 
-            else:                                   #catch for the name of script
-                db.collections.update_one({"Name":name}, {"$set":{ key : request.form[key] }})
 
         
         mongo_client.close()                                    #closes database

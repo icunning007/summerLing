@@ -1,20 +1,51 @@
 <HTML>
     <BODY>
-        <H1>{{name}}</H1>
-        <form method="GET">
-        <label for="unicode">Unicode:</label>
-        <input type="text" id="unicode" name="unicode">
-        <input type="submit" value="SUBMIT">
+        <H1>Unicode Scripts</H1>
+        <p style="color: red"> {{msg}}
+        {% if msg != '' %}
+        <a href="{{url_for("main")}}"><button type="button">OK</button></a></p>
+        {% endif %}
+        <form method=POST>
+        <label for="newScript">New Script:</label>
+        <input type="text" id="newScript" name="newScript">
+        <input type="submit" value="ADD SCRIPT">
         </form>
 
-        <form method=POST>
-        <input type="text" id="newScript" name="newScript">
-
-        <h2>{{name}}</h2>
-            <ul style="width:80%; padding: 1em;border:1px;border-color:#0000;border-style:solid; background-color: rgb(206, 212, 224, 0.5);">
-                {% for s in scripts %}
-                    <li><b><a href={{url_for('script', scr=s['name'])}}>{{s['name']}}</a></b></li>
+        <H3>UNcompleted Scripts</H3>
+            <Table border=1 style="width:70%">
+                {% for s in uncertScripts %}
+                    <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>
+                    <td><span style="color:red">&#10060;</span></td>
+                    <td><a href={{url_for("main", delKey=key, keyScript=s['Name'])}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td></tr>
                 {% endfor %}
-            </ul>
+            </table>
+
+        <H3>Completed Scripts</H3>
+            <Table border=1 style="width:70%">
+                {% for s in certScripts %}
+                    <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>
+                    <td><span style="color:green">&#10003;</span></td>
+                    <td><a href={{url_for("main", delKey=key, keyScript=s['Name'])}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td></tr>
+                {% endfor %}
+            </table>
+
+
+        
+
+<!--        <h2>Existing Scripts</h2>
+            <Table border=1 style="width:70%">
+                {% for s in scripts %}
+                    <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>
+                    {% if scriptCertTF[s['Name']] == 1 %}
+                    <td><span style="color:green">&#10003;</span></td>
+                    {% else %}
+                    <td><span style="color:red">&#10060;</span></td>
+                    {% endif %}
+                    <td><a href={{url_for("main", delKey=key, keyScript=s['Name'])}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td></tr>
+
+                {% endfor %}
+            </table>
+-->        <br><br>
+
     </BODY>
 </HTML>

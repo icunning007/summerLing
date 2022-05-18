@@ -1,0 +1,243 @@
+<html>
+<head>
+    <title></title>
+</head>
+    <body>
+    {% if certTF==1 %}
+    <H3 style="color: green">{{scripts.Name}}</H3>
+    {% else %}
+    <H3>{{scripts.Name}}</H3> 
+    {% endif %}
+    <p style="color: red"> {{msg}}
+        {% if msg != '' %}
+        <a href="{{url_for("scriptEdit", scr=scripts.Name)}}"><button type="button">OK</button></a></p>
+        {% endif %}
+
+    <form method=POST>
+    <table border=1>
+    {% for key, val in scripts.items() %}
+    {% if "ignore" not in key %}
+    <tr><td>{{key}}</td>
+    {% if key == "Name" %}
+    <td>{{val}}</td>
+    <input type="hidden" id="{{key}}" name="{{key}}" value="{{val}}"/>
+
+    {% else %}
+    <td><input type="text" style="width: 500px;" id="{{key}}" name="{{key}}" value="{{val}}" /></td>
+    <!--<td><a href={{url_for("scriptEdit", delkey=key, nam=scripts.Name)}}>DELETE</a></td>
+    -->
+    {% endif %}{% endif %}
+    {% endfor %}
+    {% for k in keys %}
+    <tr><td>{{k}}</td>
+    <td>
+    <table border="1" style="width:50px">
+    {% for a in dic[k] %}
+    {% for v in a %}
+    <tr>
+    {% if tf[v]==1 %}
+    <td><textarea type="text" style="width: 423px;" id="{{k}}" rows="1" name="{{k}}_{{v}}" value="{{v}}"/>{{v}}</textarea></td>
+    {% else %}
+    <td><input type="text" style="width: 423px;" id="{{k}}" name="{{k}}_{{v}}" value="{{v}}"/></td>
+    {% endif %}
+    {% if "ignore" not in k %}
+    <td><a href={{url_for("scriptEdit", val=v, delValue=k, valueName=scripts.Name)}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td>
+    {% endif %}
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    </table></td>
+    {% if "ignore" not in k %}
+    <td><a href={{url_for("scriptEdit", delkey=k, nam=scripts.Name)}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td>
+    {% endif %}
+    </tr>
+    {% endfor %}
+    </table>
+    <input type="submit" value="Make changes!" />
+    </form>
+    
+    <form method=POST>
+    <table border=1>
+    
+    <tr><td>Name</td>
+    <td>{{scripts["Name"]}}</td></tr>
+    
+    <tr><td>Script Type</td>
+        {% if "scriptType" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['scriptType'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="scriptType" rows="1" 
+                    name="scriptType_{{dic['scriptType']}}" value="{{dic['scriptType']}}"/>
+                    {{v}}
+                </textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=dic["scriptType"], delValue="scriptType", valueName=dic.Name)}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="scriptType" rows="1" name="scriptType"></textarea>
+        </td>
+        {% endif %}
+    
+
+    <tr><td>Script Family</td>
+        {% if "scriptFamily" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['scriptFamily'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" 
+                    name="scriptFamily_{{dic['scriptFamily']}}" value="{{dic['scriptFamily']}}"/>
+                    {{v}}
+                </textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=dic["scriptFamily"], delValue="scriptFamily", valueName=dic.Name)}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily"></textarea>
+        </td>
+        {% endif %}
+
+    <tr><td>Script Family</td>
+    {% if "scriptFamily" in dic.keys() %}
+    <td><textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily_{{dic['scriptFamily']}}" value="{{dic['scriptFamily']}}"/>{{dic['scriptFamily']}}</textarea></td>
+    <td><a href={{url_for("scriptEdit", val=dic["scriptFamily"], delValue="scriptFamily", valueName=dic.Name)}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td>
+    {% else %}
+    <td><textarea type="text" style="width: 423px;" id="scriptFamily" rows="1" name="scriptFamily"></textarea></td>
+    {% endif %}
+
+    <tr><td>Hyperlinks</td>
+        {% if "Hyperlinks" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['Hyperlinks'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="Hyperlinks" rows="1" 
+                    name="Hyperlinks_{{dic['Hyperlinks']}}" value="{{dic['Hyperlinks']}}"/>
+                    {{v}}
+                </textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=dic["Hyperlinks"], delValue="Hyperlinks", valueName=dic.Name)}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="Hyperlinks" rows="1" name="Hyperlinks"></textarea>
+        </td>
+        {% endif %}
+
+    </table>
+    </form>
+
+
+
+
+
+
+
+    <H4> OR add to an <b>existing</b> or <b>new</b> key/value: </H4>
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <label for="listkey">Key: </label>
+    <input type="text" id="listkey" name="listkey"/>
+    <label for="listvalue">Value: </label>
+    <input type="text" id="listvalue" name="listvalue"/><br>
+    <input type="submit" value="Add New Value">
+    </form>
+
+    <br><br>
+
+    <H3>Bibliography: </H3>
+
+    <p><b>Text Sources~ </b></p>
+    <form method="POST">
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <input type="hidden" id="textSource" name="textSource" value="True">
+    <label for="author">Author: </label>
+    <input type="text" id="author" name="author"/>
+    <label for="author2">Additional Author: </label>
+    <input type="text" id="author2" name="author2"/><br>
+    <label for="chapter">Chapter Title: </label>
+    <input type="text" id="chapter" name="chapter"/>
+    <label for="book">Book Title: </label>
+    <input type="text" id="book" name="book"/><br>
+    <label for="publisher">Publisher: </label>
+    <input type="text" id="publisher" name="publisher"/>
+    <label for="year">Year: </label>
+    <input type="text" id="year" name="year"/><br>
+    <label for="pages">Page Range: </label>
+    <input type="text" id="pages" name="pages"/><br>
+    <input type="submit" value="Add Source"><br>
+    </form>
+    
+
+<!--    <p><b>Web Sources~ </b></p>
+    <input type="submit" value="Add source"><br>
+-->    
+    <br>
+    <H4> Check for Completion </H4>
+    <p style="color: red; font-size: 12px;">*by writing your full name you're signing that you've <b>completed</b> your portion of the research / checking</p>
+    {% if certNum1 != '' %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <p>{{scripts.Name}}</p>
+    <input type="hidden" id="unsignNum1" name="unsignNum1" value="{{certNum1}}">
+    <label for="unsignNum1">Researcher: {{certNum1}} &emsp;</label>
+    <input onclick="return confirm('Are you sure you want to UNpublish this?')" type="submit" value="Unsign"><br>
+    </form>
+    {% else %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <label for="certificationNum1">Researcher: </label>
+    <input type="text" id="certificationNum1" name="certificationNum1"/>
+    <input type="submit" value="I'm Done"><br>
+    </form>
+    {% endif %}
+
+
+    {% if certNum2 != '' %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <input type="hidden" id="unsignNum2" name="unsignNum2" value="{{certNum2}}">
+    <label for="unsignNum2">Checker: {{certNum2}} &emsp;</label>
+    <input onclick="return confirm('Are you sure you want to UNpublish this?')" type="submit" value="Unsign"><br>
+    </form>
+    {% else %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <label for="certificationNum2">Checker: </label>
+    <input type="text" id="certificationNum2" name="certificationNum2"/>
+    <input type="submit" value="I'm Done"><br>
+    </form>
+    {% endif %}
+
+    <br>
+
+    
+    <a href="{{url_for("main")}}"><button type="button">Return to Home</button></a>
+
+    </body>
+</html>

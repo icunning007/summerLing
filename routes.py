@@ -45,7 +45,7 @@ def main():
     for name in nameScripts:    #adds the name of scripts to a list
         if "bibliography" not in name['Name']:
             cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
-            print("++++" + name['Name'])
+            print(cert)
             cert = cert['ignore_certified']
             if(cert==1):
                 certScripts.append(name)
@@ -182,6 +182,31 @@ def scriptEdit():
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
         key=request.form['listkey']                 #gets key name
+        if "yperlinks" in key:
+            key = "Hyperlinks"
+        elif "escription" in key:
+            key = "description"
+        elif "evelopment" in key:
+            key = "children"
+        elif "arent" in key:
+            key = "parent"
+        elif "arliest" in key and "ocation" in key:
+            key = "earliestLoc"
+        elif "arliest" in key and "ate" in key:
+            key = "earliestDate"
+        elif "atest" in key and "ate" in key:
+            key = "latestDate"
+        elif "apitals" in key:
+            key = "capitalUsed"
+        elif "lyphs" in key:
+            key = "glyphNumber"
+        elif "irection" in key:
+            key = "direction"
+        elif "amily" in key:
+            key = "family"
+        elif "ype" in key:
+            key = "type"
+
         #key = key.title()                           #makes the key title case
         val=request.form['listvalue']               #gets value
         name=request.form['Name']                   #gets name of script
@@ -233,36 +258,47 @@ def scriptEdit():
     
     
     elif "textSource" in request.form:
-        print("here1")
         name = request.form['Name']
-        print(name)
         author = request.form['author']
-        print("here")
-        author2 = request.form['author2']
-        print("here")
         chapter = request.form['chapter']
         book = request.form['book']
         publisher = request.form['publisher']
         year = request.form['year']
         pages = request.form['pages']
-        print("here2")
         mashName = str(name) + "_biliography"
-        print("here3")
-        db.collections.update_one(
-            {   "Name" : mashName}, 
-                {"$push" : {"Sources" : 
-                    {
-                        "author" : author,
-                        "chapter" : chapter,
-                        "book" : book,
-                        "publisher" : publisher,
-                        "year" : year,
-                        "pages" : pages,
-                    }
-                }    
-            }
-        ) 
-        print("here4")
+        
+        querry = []
+
+        if author:
+            word = "'author' : '" + str(author) + "', "
+            querry.append(word)
+        if chapter:
+            word = "'chapter' : '" + str(chapter) + "', "
+            querry.append(word)
+        if book:
+            word = "'book' : '" + str(book) + "', "
+            querry.append(word)
+        if publisher:
+            word = "'publisher' : '" + str(publisher) + "', "
+            querry.append(word)
+        if year:
+            word = "'year' : '" + str(year) + "', "
+            querry.append(word)
+        if pages:
+            word = "'pages' : '" + str(pages) + "'"
+            querry.append(word)
+
+        querry1 = ' '.join(querry)
+        print(word)
+
+        myquery1 = {"Name" : mashName}
+        myquery = {"$push" : {"Sources" : {querry1}}}
+
+        length = len(myquery)
+        print(querry1)
+
+        db.collections.update_one(myquery, myquery)
+        
         mongo_client.close()                    #closes database
         return redirect(url_for("scriptEdit",scr=name, msg=f"{book}, {year} added!"))
 
@@ -274,7 +310,7 @@ def scriptEdit():
         for key, val in request.form.items():
             print("KEY=" + key)
             print("VAL=" + val)
-            if "_" in key:                          #splits on the _ because it's the value that changes
+            if "_" in key and val:                          #splits on the _ because it's the value that changes  
                 sp = key.split("_")
                 key = sp[0]
                 oldVal = sp[1]
@@ -284,7 +320,8 @@ def scriptEdit():
                     db.collections.update_one({"Name":name}, {"$pull":{ key : oldVal}})
                     db.collections.update_one({"Name":name}, {"$push": {key : val}})
             elif "Name" not in key:
-                db.collections.update_one({"Name":name}, {"$push": {key : val}})
+                if val:
+                    db.collections.update_one({"Name":name}, {"$push": {key : val}})
 
         mongo_client.close()                                    #closes database
         

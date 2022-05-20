@@ -44,8 +44,11 @@ def main():
     nameScripts = nameScripts.sort([("Name", ASCENDING)])   #sort them in alphabetical order
     for name in nameScripts:    #adds the name of scripts to a list
         if "bibliography" not in name['Name']:
+            biliography
+
             cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
             print(cert)
+            print(name['Name'])
             cert = cert['ignore_certified']
             if(cert==1):
                 certScripts.append(name)
@@ -166,18 +169,28 @@ def scriptEdit():
         msg = ''
         if 'msg' in request.args:
             msg = request.args['msg']
-       
+      
+        
+
+
         mash = str(name) + "_bibliography"
         print(mash)
         ans = db.collections.count_documents({"Name" : mash})
-        print("ANS" + str(ans)) 
-         
-        print(filtered_data.keys())
-        print(filtered_dataList.keys())
+        
+        bib_dic = []
+        bib_true = 0
+
+        find = db.collections.find({"Name" : "Arabic_bibliography", "Sources.0" : {"$exists" : True}})
+        for f in find:
+            for val in f['Sources']:
+                bib_true = 1
+                bib_dic.append(val)
+        
+
 
         mongo_client.close()
 
-        return render_template("scriptEdit.html", certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
+        return render_template("scriptEdit.html", bib_true=bib_true, bib_dic=bib_dic, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
    
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
@@ -260,44 +273,36 @@ def scriptEdit():
     elif "textSource" in request.form:
         name = request.form['Name']
         author = request.form['author']
+        year = request.form['year']
         chapter = request.form['chapter']
         book = request.form['book']
         publisher = request.form['publisher']
-        year = request.form['year']
         pages = request.form['pages']
-        mashName = str(name) + "_biliography"
+        mashName = str(name) + "_bibliography"
         
-        querry = []
+        query = {}
 
         if author:
-            word = "'author' : '" + str(author) + "', "
-            querry.append(word)
+            query['author'] = str(author)
         if chapter:
-            word = "'chapter' : '" + str(chapter) + "', "
-            querry.append(word)
+            query['chapter'] = str(chapter)
         if book:
-            word = "'book' : '" + str(book) + "', "
-            querry.append(word)
+            query['book'] = str(book)
         if publisher:
-            word = "'publisher' : '" + str(publisher) + "', "
-            querry.append(word)
+            query['publisher'] = str(publisher)
         if year:
-            word = "'year' : '" + str(year) + "', "
-            querry.append(word)
+            query['year'] = str(year)
         if pages:
-            word = "'pages' : '" + str(pages) + "'"
-            querry.append(word)
+            query['pages'] = str(pages)
 
-        querry1 = ' '.join(querry)
-        print(word)
+        one = {"Name" : mashName}
+        two = {"$push" : {"Sources" : query}}
 
-        myquery1 = {"Name" : mashName}
-        myquery = {"$push" : {"Sources" : {querry1}}}
 
-        length = len(myquery)
-        print(querry1)
-
-        db.collections.update_one(myquery, myquery)
+        print('db.collections.update_one({"Name" : "test_biliography"}, {"$push" : {"Sources" : {"author" : "Boy, Guy",  "chapter" : "What he does cool",  "book" : "The book",  "publisher" : "Food Network",  "year" : "2009 CE",  "pages" : "40-79"}}})')
+        print("db.collections.update_one(" + str(one) + str(two))
+        
+        db.collections.update_one(one, two)
         
         mongo_client.close()                    #closes database
         return redirect(url_for("scriptEdit",scr=name, msg=f"{book}, {year} added!"))

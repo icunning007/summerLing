@@ -213,7 +213,9 @@
         </td>
         {% endif %}
     
-    <tr><td>Parentage</td>
+    <tr><td>Parentage
+    <p style="font-size: 12px;">if you want it to connect to another script, the name must be the same as the parent script in the database.</p>
+    </td>
         {% if "parent" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -337,6 +339,44 @@
 
     <H3>Bibliography: </H3>
 
+    {% if bib_true==1 %}
+    <table border=1>
+    
+    <tr><th>Author</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["author"]}}</td></tr>
+    {% endfor %}
+    
+    <tr><th>Year</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["year"]}}</td></tr>
+    {% endfor %}
+    
+    <tr><th>Book</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["book"]}}</td></tr>
+    {% endfor %}
+    
+    <tr><th>Chapter</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["chapter"]}}</td></tr>
+    {% endfor %}
+    
+    <tr><th>Pages</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["pages"]}}</td></tr>
+    {% endfor %}
+    
+    <tr><th>Publisher</th>
+    {% for dic in bib_dic %}
+    <td>{{dic["publisher"]}}</td></tr>
+    {% endfor %}
+  
+
+    </table>
+    {% endif %}
+
+
     <p><b>Text Sources~ </b></p>
     <form method="POST">
     <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
@@ -344,15 +384,15 @@
     <label for="author">Author: </label>
     <input type="text" id="author" name="author"/>
     <p style="font-size: 12px;">**if <b>more than one author-</b> seperate by a comma and the last author by an "and".<br> Example: <b>"Rock, Chirs and Smith, Will"</b> or <b>"Spears, Britney, Bezos, Jeff and Holland, Tom"</b></p>
+    <label for="year">Year: </label>
+    <input type="text" id="year" name="year"/><br>
+    <p style="font-size: 12px;">**write year 'space' century. Example: <b>512 CE</b> or <b>3,000 BCE</b> if in this era it's CE i.e. 1999 CE</p>
     <label for="chapter">Chapter Title: </label>
     <input type="text" id="chapter" name="chapter"/><br>
     <label for="book">Book Title: </label>
     <input type="text" id="book" name="book"/><br>
     <label for="publisher">Publisher: </label>
     <input type="text" id="publisher" name="publisher"/><br>
-    <label for="year">Year: </label>
-    <input type="text" id="year" name="year"/><br>
-    <p style="font-size: 12px;">**write year 'space' century. Example: <b>512 CE</b> or <b>3,000 BCE</b> if in this era it's CE i.e. 1999 CE</p>
     <label for="pages">Page Range: </label>
     <input type="text" id="pages" name="pages"/><br>
     <input type="submit" value="Add Source"><br>

@@ -12,6 +12,11 @@
         </form>
 
         <H3>UNcompleted Scripts</H3>
+            <form method="POST">
+                <input type="hidden", id="filtScript" name="filtScript" value=1>
+                <label for="Key">Field:</label>
+
+
             <Table border=1 style="width:70%">
                 {% for s in uncertScripts %}
                     <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>

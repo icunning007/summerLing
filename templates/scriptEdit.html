@@ -16,11 +16,11 @@
     <form method=POST>
     <table border=1>
     
-    <tr><td>Name</td>
+    <tr><th>Name</th>
     <td>{{scripts["Name"]}}</td></tr>
     <input type="hidden" id="Name" name="Name" value="{{scripts['Name']}}"/>
     
-    <tr><td>Type</td>
+    <tr><th>Type</th>
         {% if "type" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -45,7 +45,7 @@
         {% endif %}
     
 
-    <tr><td>Family</td>
+    <tr><th>Family</th>
         {% if "family" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -69,7 +69,7 @@
         </td>
         {% endif %}
     
-    <tr><td>Direction</td>
+    <tr><th>Direction</th>
         {% if "direction" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -93,7 +93,7 @@
         </td>
         {% endif %}
 
-    <tr><td>Number of Glyphs</td>
+    <tr><th>Number of Glyphs</th>
         {% if "glyphNumber" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -117,7 +117,7 @@
         </td>
         {% endif %}
 
-    <tr><td>Use Capitals</td>
+    <tr><th>Use Capitals</th>
         {% if "capitalUsed" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -141,7 +141,7 @@
         </td>
         {% endif %}
 
-    <tr><td>Earliest Attestation Date</td>
+    <tr><th>Earliest Attestation Date</th>
         {% if "earliestDate" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -165,7 +165,7 @@
         </td>
         {% endif %}
     
-    <tr><td>Latest Attestation Date</td>
+    <tr><th>Latest Attestation Date</th>
         {% if "latestDate" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -189,7 +189,7 @@
         </td>
         {% endif %}
     
-    <tr><td>Earliest Attestation Location</td>
+    <tr><th>Earliest Attestation Location</th>
         {% if "earliestLoc" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -213,9 +213,9 @@
         </td>
         {% endif %}
     
-    <tr><td>Parentage
-    <p style="font-size: 12px;">if you want it to connect to another script, the name must be the same as the parent script in the database.</p>
-    </td>
+    <tr><th>Parentage
+    <p style="font-size: 12px;">Name==parent script in dbs.</p>
+    </th>
         {% if "parent" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -239,7 +239,7 @@
         </td>
         {% endif %}
     
-    <tr><td>Development (Children)</td>
+    <tr><th>Development (Children)</th>
         {% if "children" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -263,7 +263,7 @@
         </td>
         {% endif %}
         
-    <tr><td>Description</td>
+    <tr><th>Description</th>
         {% if "description" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -287,7 +287,7 @@
         </td>
         {% endif %}
 
-    <tr><td>Hyperlinks</td>
+    <tr><th>Hyperlinks</th>
         {% if "Hyperlinks" in dic.keys() %}
         <td>
             <table border="1" style="width:50px">
@@ -341,37 +341,60 @@
 
     {% if bib_true==1 %}
     <table border=1>
-    
+        <tr>
+            <th>Author</th>
+            <th>Year</th>
+            <th>Book</th>
+            <th>Chapter</th>
+            <th>Pages</th>
+            <th>Publisher</th>
+        </tr>
+        {% for dic in bib_dic %}
+            <tr>
+            <td>{{dic["author"]}}</td>
+            <td>{{dic["year"]}}</td>
+            <td>{{dic["book"]}}</td>
+            <td>{{dic["chapter"]}}</td>
+            <td>{{dic["pages"]}}</td>
+            <td>{{dic["publisher"]}}</td>
+            <td>
+                <a href={{url_for("scriptEdit", author=dic['author'], year=dic['year'], book=dic['book'], chapter=dic['chapter'], pages=dic['pages'], publisher=dic['publisher'], bibName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td>
+            </tr>
+        {% endfor %}
+
+<!--    
     <tr><th>Author</th>
     {% for dic in bib_dic %}
-    <td>{{dic["author"]}}</td></tr>
+    <td>{{dic["author"]}}</td>
     {% endfor %}
     
     <tr><th>Year</th>
     {% for dic in bib_dic %}
-    <td>{{dic["year"]}}</td></tr>
+    <td>{{dic["year"]}}</td>
     {% endfor %}
     
     <tr><th>Book</th>
     {% for dic in bib_dic %}
-    <td>{{dic["book"]}}</td></tr>
+    <td>{{dic["book"]}}</td>
     {% endfor %}
     
     <tr><th>Chapter</th>
     {% for dic in bib_dic %}
-    <td>{{dic["chapter"]}}</td></tr>
+    <td>{{dic["chapter"]}}</td>
     {% endfor %}
     
     <tr><th>Pages</th>
     {% for dic in bib_dic %}
-    <td>{{dic["pages"]}}</td></tr>
+    <td>{{dic["pages"]}}</td>
     {% endfor %}
     
     <tr><th>Publisher</th>
     {% for dic in bib_dic %}
-    <td>{{dic["publisher"]}}</td></tr>
+    <td>{{dic["publisher"]}}</td>
     {% endfor %}
-  
+-->
 
     </table>
     {% endif %}

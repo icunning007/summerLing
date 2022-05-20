@@ -11,11 +11,31 @@
         <input type="submit" value="ADD SCRIPT">
         </form>
 
-        <H3>UNcompleted Scripts</H3>
-            <form method="POST">
+        <H3>Uncompleted Scripts:</H3>
+            <form method=POST>
                 <input type="hidden", id="filtScript" name="filtScript" value=1>
-                <label for="Key">Field:</label>
+                <label for="key">Field:</label>
+                <select name="key" id="key">
+                    <option value="none">None</option>
+                    <option value="type">Type</option>
+                    <option value="family">Family</option>
+                    <option value="direction">Direction</option>
+                    <option value="glyphNumber">Number of Glyphs</option>
+                    <option value="capitalUsed">Use Capitals</option>
+                    <option value="earliestDate">Earliest Attestation Date</option>
+                    <option value="latestDate">Latest Attestation Date</option>
+                    <option value="earliestLoc">Earliest Attestation Location</option>
+                    <option value="parent">Parentage</option>
+                    <option value="children">Development</option>
+                    <option value="description">Description</option>
+                    <option value="Hyperlinks">Hyperlinks</option>
+                    
+                </select>
 
+                <label for= "value"> Value: </label>
+                <input type="text" id="value" name="value"><br><br>
+                <input type='submit' value="Filter">
+            </form>
 
             <Table border=1 style="width:70%">
                 {% for s in uncertScripts %}
@@ -25,7 +45,7 @@
                 {% endfor %}
             </table>
 
-        <H3>Completed Scripts</H3>
+        <H3>Completed Scripts:</H3>
             <Table border=1 style="width:70%">
                 {% for s in certScripts %}
                     <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>
@@ -34,8 +54,29 @@
                 {% endfor %}
             </table>
 
-
-        
+        <H3>Bibliography:</H3>
+            <Table border=1 style="width:60%">
+            <tr>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Book</th>
+                <th>Chapter</th>
+                <th>Pages</th>
+                <th>Publisher</th>
+                <th>Script</th>
+            </tr>
+            {% for dic in bib_dic %}
+            <tr>
+                <td>{{dic["author"]}}</td>
+                <td>{{dic["year"]}}</td>
+                <td>{{dic["book"]}}</td>
+                <td>{{dic["chapter"]}}</td>
+                <td>{{dic["pages"]}}</td>
+                <td>{{dic["publisher"]}}</td>
+                <td><a href={{url_for("scriptEdit", scr=dic['script'])}}>{{dic['script']}}</a></td>
+            </tr>
+        {% endfor %}
+        </table>
 
 <!--        <h2>Existing Scripts</h2>
             <Table border=1 style="width:70%">

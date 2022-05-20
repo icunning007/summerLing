@@ -36,28 +36,59 @@ def main():
         mongo_client.close()
         return redirect(url_for("main",scr=name, msg=f"{key} deleted from {name} successfully!"))
 
+    nameScripts = db.collections.find()                     #get all the scripts
+    nameScripts = nameScripts.sort([("Name", ASCENDING)])   #sort them in alphabetical order
+    
+    if "filtScript" in request.form:
+        key = request.form['key']
+        value = request.form['value']
+        print(key)
+        if key != "none":
+            if value:
+                print("yes-value")
+                ans = db.collections.find({key : {"$regex": value, "$options": 'i'}})
+                nameScripts = ans.sort([("name", ASCENDING)])
+            else:
+                print("no-value")
+                ans = db.collections.find({ key : {"$exists" : 1 }})
+                nameScripts = ans.sort([("name", ASCENDING)])
+
+
     #code for displaying existing skripts
     certScripts = []
     uncertScripts = []
     scriptCertTF = {}
-    nameScripts = db.collections.find()                     #get all the scripts
-    nameScripts = nameScripts.sort([("Name", ASCENDING)])   #sort them in alphabetical order
+
+    bib_dic = []
+    bib_true = 0
+
     for name in nameScripts:    #adds the name of scripts to a list
         if "bibliography" not in name['Name']:
-            biliography
-
-            cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
-            print(cert)
             print(name['Name'])
+            cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
             cert = cert['ignore_certified']
             if(cert==1):
                 certScripts.append(name)
             else:
                 uncertScripts.append(name)
 
-            print(cert)
             name = str(name['Name'])
             scriptCertTF[name] = cert 
+    
+    allScripts = db.collections.find()                     #get all the scripts
+    allScripts = allScripts.sort([("Name", ASCENDING)])    #sort them in alphabetical order
+    for name in allScripts:
+        if "bibliography" in name["Name"]:
+            print(name['Name'])
+            script = str(name['Name']).split("_")
+            find = db.collections.find({"Name" : name['Name'], "Sources.0" : {"$exists" : True}})
+            for f in find:
+                for val in f['Sources']:
+                    bib_true = 1
+                    val['script'] = script[0]
+                    bib_dic.append(val)
+            
+
     #if there's a mesage we get it here
     msg = ''
     if 'msg' in request.args:
@@ -66,7 +97,7 @@ def main():
     print(scriptCertTF)
 
     mongo_client.close()                                    #closes the database
-    return render_template("basic.html", msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
+    return render_template("basic.html", bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
     
 '''code for editing an individual script'''
 @mysubsite.route("/script", methods=['GET', 'POST'])
@@ -98,7 +129,31 @@ def scriptEdit():
         db.collections.update_one({"Name":name}, {"$unset":{key : ""}})
         mongo_client.close()
         return redirect(url_for("scriptEdit",scr=name, msg=f"{key} deleted from {name} successfully!"))
-    
+   
+    if "bibName" in request.args:
+        name = request.args['bibName']
+        mash = str(name) + "_bibliography"
+        publisher = request.args['publisher']
+        print("|", publisher, "|")
+        query = {}
+        
+        if request.args['author']:
+            query['author'] = request.args['author']
+        if request.args['year']:
+            query['year'] = request.args['year']
+        if request.args['book']:
+            query['book'] = request.args['book']
+        if request.args['chapter']:
+            query['chapter'] = request.args['chapter']
+        if request.args['pages']:
+            query['pages'] = request.args['pages']
+        if request.args['publisher']:
+            query['publisher'] = request.args['publisher']
+
+        db.collections.update_one({"Name" : mash}, {"$pull" : {"Sources" : query}})
+
+        return redirect(url_for("scriptEdit",scr=name, msg=f"Source deleted from {name} successfully!"))
+
     if request.method=="GET":
         #name of script
         name = request.args['scr']
@@ -274,10 +329,10 @@ def scriptEdit():
         name = request.form['Name']
         author = request.form['author']
         year = request.form['year']
-        chapter = request.form['chapter']
         book = request.form['book']
-        publisher = request.form['publisher']
+        chapter = request.form['chapter']
         pages = request.form['pages']
+        publisher = request.form['publisher']
         mashName = str(name) + "_bibliography"
         
         query = {}

@@ -3,8 +3,27 @@ from flask import render_template
 from summer import mysubsite
 from pymongo import MongoClient, ASCENDING, DESCENDING
 
-''''code for displaying all the scripts'''
+@mysubsite.route("/example", methods=['GET', 'POST'])
+def example():
+    return render_template("example.html")
+
 @mysubsite.route("/", methods=['GET', 'POST'])
+def password():
+    if 'password' in request.form:
+        password = request.form['password']
+        correctpass = 'teamFallon'
+        if password == correctpass:
+            return redirect(url_for("main", msg=f"Your password was correct!"))
+        else:
+            return redirect(url_for("password", msg=f"Incorrect Password >:|"))
+    else:
+        msg = ''
+        if 'msg' in request.args:
+            msg = request.args['msg']
+        return render_template('password.html', msg=msg)
+
+''''code for displaying all the scripts'''
+@mysubsite.route("/dataEntry", methods=['GET', 'POST'])
 def main():
     #opens mongo Database
     mongo_client = MongoClient("mongodb://localhost:27017")
@@ -33,24 +52,46 @@ def main():
         name = request.args['keyScript']
         key = request.args['delKey']
         db.collections.delete_one({"Name":name})
+        mash = str(name) + "_bibliography"
+        db.collections.delete_one({"Name":mash})
         mongo_client.close()
         return redirect(url_for("main",scr=name, msg=f"{key} deleted from {name} successfully!"))
 
     nameScripts = db.collections.find()                     #get all the scripts
     nameScripts = nameScripts.sort([("Name", ASCENDING)])   #sort them in alphabetical order
+    keyLabel = ""
+    valueLabel = ""
+    existsLabel = "yes"
     
     if "filtScript" in request.form:
         key = request.form['key']
         value = request.form['value']
+        exists = request.form['true_false']
+
         print(key)
-        if key != "none":
+        if key != "none" and exists == "yes":
             if value:
-                print("yes-value")
+                existsLabel = "yes"
+                keyLabel = str(key)
+                valueLabel = str(value)
                 ans = db.collections.find({key : {"$regex": value, "$options": 'i'}})
                 nameScripts = ans.sort([("name", ASCENDING)])
             else:
-                print("no-value")
+                existsLabel = "yes"
+                keyLabel = str(key)
                 ans = db.collections.find({ key : {"$exists" : 1 }})
+                nameScripts = ans.sort([("name", ASCENDING)])
+        if key != "none" and exists == "no":
+            if value:
+                existsLabel = "no"
+                keyLabel = str(key)
+                valueLabel = str(value)
+                ans = db.collections.find({key : {"$regex": value, "$exists" : 0, "$options": 'i'}})
+                nameScripts = ans.sort([("name", ASCENDING)])
+            else:
+                existsLabel = "no"
+                keyLabel = str(key)
+                ans = db.collections.find({ key : {"$exists" : 0 }})
                 nameScripts = ans.sort([("name", ASCENDING)])
 
 
@@ -97,7 +138,7 @@ def main():
     print(scriptCertTF)
 
     mongo_client.close()                                    #closes the database
-    return render_template("basic.html", bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
+    return render_template("basic.html", valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
     
 '''code for editing an individual script'''
 @mysubsite.route("/script", methods=['GET', 'POST'])
@@ -149,6 +190,8 @@ def scriptEdit():
             query['pages'] = request.args['pages']
         if request.args['publisher']:
             query['publisher'] = request.args['publisher']
+        if request.args['url']:
+            query['url'] = request.args['url']
 
         db.collections.update_one({"Name" : mash}, {"$pull" : {"Sources" : query}})
 
@@ -235,7 +278,7 @@ def scriptEdit():
         bib_dic = []
         bib_true = 0
 
-        find = db.collections.find({"Name" : "Arabic_bibliography", "Sources.0" : {"$exists" : True}})
+        find = db.collections.find({"Name" : mash, "Sources.0" : {"$exists" : True}})
         for f in find:
             for val in f['Sources']:
                 bib_true = 1
@@ -250,14 +293,22 @@ def scriptEdit():
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
         key=request.form['listkey']                 #gets key name
-        if "yperlinks" in key:
+        if "mages" in key:
+            key = "imageAddress"
+        elif "yperlinks" in key:
             key = "Hyperlinks"
         elif "escription" in key:
             key = "description"
-        elif "evelopment" in key:
+        elif "anguage" in key:
+            key = "languages"
+        elif "fficial" in key or "ountries" in key:
+            key = "countries"
+        elif "evelopment" in key or "hildren" in key:
             key = "children"
         elif "arent" in key:
             key = "parent"
+        elif "nventor" in key:
+            key = "inventor"
         elif "arliest" in key and "ocation" in key:
             key = "earliestLoc"
         elif "arliest" in key and "ate" in key:
@@ -266,14 +317,24 @@ def scriptEdit():
             key = "latestDate"
         elif "apitals" in key:
             key = "capitalUsed"
+        elif "ontextual" in key:
+            key = "contextualForms"
+        elif "iacritics" in key:
+            key = "diacritics"
         elif "lyphs" in key:
             key = "glyphNumber"
         elif "irection" in key:
             key = "direction"
+        elif "nicode" in key:
+            key = "unicode"
         elif "amily" in key:
             key = "family"
         elif "ype" in key:
             key = "type"
+        elif "ote" in key or "esearch" in key:
+            key = "researchNotes"
+    
+        
 
         #key = key.title()                           #makes the key title case
         val=request.form['listvalue']               #gets value
@@ -327,40 +388,43 @@ def scriptEdit():
     
     elif "textSource" in request.form:
         name = request.form['Name']
-        author = request.form['author']
-        year = request.form['year']
-        book = request.form['book']
-        chapter = request.form['chapter']
-        pages = request.form['pages']
-        publisher = request.form['publisher']
+
         mashName = str(name) + "_bibliography"
         
         query = {}
 
-        if author:
+        if 'author' in request.form:
+            author = request.form['author']
             query['author'] = str(author)
-        if chapter:
+        if 'chapter' in request.form:
+            chapter = request.form['chapter']
             query['chapter'] = str(chapter)
-        if book:
+        if 'book' in request.form:
+            book = request.form['book']
             query['book'] = str(book)
-        if publisher:
+        if 'publisher' in request.form:
+            publisher = request.form['publisher']
             query['publisher'] = str(publisher)
-        if year:
+        if 'year' in request.form:
+            year = request.form['year']
             query['year'] = str(year)
-        if pages:
+        if 'pages' in request.form:
+            pages = request.form['pages']
             query['pages'] = str(pages)
+        if 'url' in request.form:
+            url = request.form['url']
+            query['url'] = str(url)
 
         one = {"Name" : mashName}
         two = {"$push" : {"Sources" : query}}
 
 
-        print('db.collections.update_one({"Name" : "test_biliography"}, {"$push" : {"Sources" : {"author" : "Boy, Guy",  "chapter" : "What he does cool",  "book" : "The book",  "publisher" : "Food Network",  "year" : "2009 CE",  "pages" : "40-79"}}})')
-        print("db.collections.update_one(" + str(one) + str(two))
+        print("Here")
         
         db.collections.update_one(one, two)
         
         mongo_client.close()                    #closes database
-        return redirect(url_for("scriptEdit",scr=name, msg=f"{book}, {year} added!"))
+        return redirect(url_for("scriptEdit",scr=name, msg=f"Source added!"))
 
 
     #for make changes portion

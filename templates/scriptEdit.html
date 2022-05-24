@@ -28,8 +28,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="type_{{dic['type']}}" rows="1" 
-                    name="type_{{dic['type']}}" value="{{dic['type']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="type_{{v}}" rows="1" 
+                    name="type_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="type", valueName=scripts["Name"])}} 
@@ -53,8 +53,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="family_{{dic['family']}}" rows="1" 
-                    name="family_{{dic['family']}}" value="{{dic['family']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="family_{{v}}" rows="1" 
+                    name="family_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="family", valueName=scripts["Name"])}} 
@@ -69,6 +69,31 @@
         </td>
         {% endif %}
     
+    <tr><th>Unicode
+    </th>
+        {% if "unicode" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['unicode'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="unicode_{{v}}" rows="1" 
+                    name="unicode_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="unicode", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="unicode" rows="1" name="unicode"></textarea>
+        </td>
+        {% endif %}
+    
     <tr><th>Direction</th>
         {% if "direction" in dic.keys() %}
         <td>
@@ -77,8 +102,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="direction_{{dic['direction']}}" rows="1" 
-                    name="direction_{{dic['direction']}}" value="{{dic['direction']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="direction_{{v}}" rows="1" 
+                    name="direction_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="direction", valueName=scripts["Name"])}} 
@@ -101,8 +126,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="glyphNumber_{{dic['glyphNumber']}}" rows="1" 
-                    name="glyphNumber_{{dic['glyphNumber']}}" value="{{dic['glyphNumber']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="glyphNumber_{{v}}" rows="1" 
+                    name="glyphNumber_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="glyphNumber", valueName=scripts["Name"])}} 
@@ -116,6 +141,56 @@
             <textarea type="text" style="width: 423px;" id="glyphNumber" rows="1" name="glyphNumber"></textarea>
         </td>
         {% endif %}
+    
+    <tr><th>Diacritics
+    </th>
+        {% if "diacritics" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['diacritics'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="diacritics_{{v}}" rows="1" 
+                    name="diacritics_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="diacritics", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="diacritics" rows="1" name="diacritics"></textarea>
+        </td>
+        {% endif %}
+    
+    <tr><th>Contextual Forms
+    </th>
+        {% if "contextualForms" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['contextualForms'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="contextualForms_{{v}}" rows="1" 
+                    name="contextualForms_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="contextualForms", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="contextualForms" rows="1" name="contextualForms"></textarea>
+        </td>
+        {% endif %}
 
     <tr><th>Use Capitals</th>
         {% if "capitalUsed" in dic.keys() %}
@@ -125,8 +200,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="capitalUsed_{{dic['capitalUsed']}}" rows="1" 
-                    name="capitalUsed_{{dic['capitalUsed']}}" value="{{dic['capitalUsed']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="capitalUsed_{{v}}" rows="1" 
+                    name="capitalUsed_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="capitalUsed", valueName=scripts["Name"])}} 
@@ -149,8 +224,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="earliestDate_{{dic['earliestDate']}}" rows="1" 
-                    name="earliestDate_{{dic['earliestDate']}}" value="{{dic['earliestDate']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="earliestDate_{{v}}" rows="1" 
+                    name="earliestDate_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="earliestDate", valueName=scripts["Name"])}} 
@@ -173,8 +248,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="latestDate_{{dic['latestDate']}}" rows="1" 
-                    name="latestDate_{{dic['latestDate']}}" value="{{dic['latestDate']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="latestDate_{{v}}" rows="1" 
+                    name="latestDate_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="latestDate", valueName=scripts["Name"])}} 
@@ -197,8 +272,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="earliestLoc_{{dic['earliestLoc']}}" rows="1" 
-                    name="earliestLoc_{{dic['earliestLoc']}}" value="{{dic['earliestLoc']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="earliestLoc_{{v}}" rows="1" 
+                    name="earliestLoc_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="earliestLoc", valueName=scripts["Name"])}} 
@@ -213,6 +288,31 @@
         </td>
         {% endif %}
     
+    <tr><th>Inventor
+    </th>
+        {% if "inventor" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['inventor'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="inventor_{{v}}" rows="1" 
+                    name="inventor_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="inventor", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="inventor" rows="1" name="inventor"></textarea>
+        </td>
+        {% endif %}
+    
     <tr><th>Parentage
     <p style="font-size: 12px;">Name==parent script in dbs.</p>
     </th>
@@ -223,8 +323,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="parent_{{dic['parent']}}" rows="1" 
-                    name="parent_{{dic['parent']}}" value="{{dic['parent']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="parent_{{v}}" rows="1" 
+                    name="parent_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="parent", valueName=scripts["Name"])}} 
@@ -247,8 +347,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="children_{{dic['children']}}" rows="1" 
-                    name="children_{{dic['children']}}" value="{{dic['children']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="children_{{v}}" rows="1" 
+                    name="children_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="children", valueName=scripts["Name"])}} 
@@ -262,6 +362,56 @@
             <textarea type="text" style="width: 423px;" id="children" rows="1" name="children"></textarea>
         </td>
         {% endif %}
+    
+    <tr><th>Official Status (Countries)
+    </th>
+        {% if "countries" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['countries'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="countries_{{v}}" rows="1" 
+                    name="countries_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="countries", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="countries" rows="1" name="countries"></textarea>
+        </td>
+        {% endif %}
+    
+    <tr><th>Languages
+    </th>
+        {% if "languages" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['languages'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="languages_{{v}}" rows="1" 
+                    name="languages_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="languages", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="languages" rows="1" name="languages"></textarea>
+        </td>
+        {% endif %}
         
     <tr><th>Description</th>
         {% if "description" in dic.keys() %}
@@ -271,8 +421,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="description_{{dic['description']}}" rows="1" 
-                    name="description_{{dic['description']}}" value="{{dic['description']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="description_{{v}}" rows="1" 
+                    name="description_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="description", valueName=scripts["Name"])}} 
@@ -295,8 +445,8 @@
             {% for v in a %}
             <tr>
             <td>
-                <textarea type="text" style="width: 423px;" id="Hyperlinks_{{dic['Hyperlinks']}}" rows="1" 
-                    name="Hyperlinks_{{dic['Hyperlinks']}}" value="{{dic['Hyperlinks']}}"/>{{v}}</textarea>
+                <textarea type="text" style="width: 423px;" id="Hyperlinks_{{v}}" rows="1" 
+                    name="Hyperlinks_{{v}}" value="{{v}}"/>{{v}}</textarea>
             </td>
             <td>
                 <a href={{url_for("scriptEdit", val=v, delValue="Hyperlinks", valueName=scripts["Name"])}} 
@@ -308,6 +458,56 @@
         {% else %}
         <td>
             <textarea type="text" style="width: 423px;" id="Hyperlinks" rows="1" name="Hyperlinks"></textarea>
+        </td>
+        {% endif %}
+    
+    <tr><th>Image Address
+    </th>
+        {% if "imageAddress" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['imageAddress'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="imageAddress_{{v}}" rows="1" 
+                    name="imageAddress_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="imageAddress", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="inventor" rows="1" name="inventor"></textarea>
+        </td>
+        {% endif %}
+    
+    <tr><th>Research Notes
+    </th>
+        {% if "researchNotes" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['researchNotes'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="researchNotes_{{v}}" rows="1" 
+                    name="researchNotes_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="researchNotes", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="researchNotes" rows="1" name="researchNotes"></textarea>
         </td>
         {% endif %}
     
@@ -326,15 +526,6 @@
     <input type="submit" value="Add New Value">
     </form>
 
-    <H4>Add example image</H4>
-
-    <form method=POST action="/action_page.php">
-        <label for="img">Select image:</label>
-        <input type="file" id="img" name="img" accept="image/*">
-        <input type="submit">
-    </form>
-
-
     <br><br>
 
     <H3>Bibliography: </H3>
@@ -348,6 +539,7 @@
             <th>Chapter</th>
             <th>Pages</th>
             <th>Publisher</th>
+            <th>URL</th>
         </tr>
         {% for dic in bib_dic %}
             <tr>
@@ -357,6 +549,7 @@
             <td>{{dic["chapter"]}}</td>
             <td>{{dic["pages"]}}</td>
             <td>{{dic["publisher"]}}</td>
+            <td>{{dic["url"]}}</td>
             <td>
                 <a href={{url_for("scriptEdit", author=dic['author'], year=dic['year'], book=dic['book'], chapter=dic['chapter'], pages=dic['pages'], publisher=dic['publisher'], bibName=scripts["Name"])}} 
                     onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
@@ -364,37 +557,6 @@
             </tr>
         {% endfor %}
 
-<!--    
-    <tr><th>Author</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["author"]}}</td>
-    {% endfor %}
-    
-    <tr><th>Year</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["year"]}}</td>
-    {% endfor %}
-    
-    <tr><th>Book</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["book"]}}</td>
-    {% endfor %}
-    
-    <tr><th>Chapter</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["chapter"]}}</td>
-    {% endfor %}
-    
-    <tr><th>Pages</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["pages"]}}</td>
-    {% endfor %}
-    
-    <tr><th>Publisher</th>
-    {% for dic in bib_dic %}
-    <td>{{dic["publisher"]}}</td>
-    {% endfor %}
--->
 
     </table>
     {% endif %}
@@ -422,9 +584,24 @@
     </form>
     
 
-<!--    <p><b>Web Sources~ </b></p>
-    <input type="submit" value="Add source"><br>
--->    
+    <p><b>Web Sources~ </b></p>
+    <form method="POST">
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <input type="hidden" id="textSource" name="textSource" value="True">
+    <label for="author">Author: </label>
+    <input type="text" id="author" name="author"/>
+    <p style="font-size: 12px;">**if <b>more than one author-</b> seperate by a comma and the last author by an "and".<br> Example: <b>"Rock, Chirs and Smith, Will"</b> or <b>"Spears, Britney, Bezos, Jeff and Holland, Tom"</b></p>
+    <label for="year">Year: </label>
+    <input type="text" id="year" name="year"/><br>
+    <p style="font-size: 12px;">**write year 'space' century. Example: <b>512 CE</b> or <b>3,000 BCE</b> if in this era it's CE i.e. 1999 CE</p>
+    <label for="publisher">Publisher: </label>
+    <input type="text" id="publisher" name="publisher"/><br>
+    <label for="url">URL: </label>
+    <input type="text" id="url" name="url"/><br>
+    <input type="submit" value="Add Source"><br>
+    </form>
+    
+
     <br>
     <H4> Check for Completion </H4>
     <p style="color: red; font-size: 12px;">*by writing your full name you're signing that you've <b>completed</b> your portion of the research / checking</p>

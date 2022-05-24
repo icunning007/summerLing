@@ -1,41 +1,77 @@
 <HTML>
+    <HEAD>
+    </HEAD>
     <BODY>
-        <H1>World Scripts</H1>
+        <H1>World Scripts Data Entry:</H1>
         <p style="color: red"> {{msg}}
         {% if msg != '' %}
         <a href="{{url_for("main")}}"><button type="button">OK</button></a></p>
         {% endif %}
         <form method=POST>
-        <label for="newScript">New Script:</label>
+        <label for="newScript"><b>New Script</b> (Name)<b>:</b></label>
         <input type="text" id="newScript" name="newScript">
         <input type="submit" value="ADD SCRIPT">
         </form>
+        <hr> 
+        <H4>Filter Scripts:</H4>
+        <p>To check for a script that has ___ field, use "Exists", to find the one's missing ___ field use "Doesn't Exist" <br> 
+        &ensp; if you leave the value blank it will search for only the field but it you put a word/number in value it will search <br>
+        &ensp; for any scripts that have that word/number in the specified key (or ones that don't if you use "Doesn't Exist")</p>
 
-        <H3>Uncompleted Scripts:</H3>
             <form method=POST>
                 <input type="hidden", id="filtScript" name="filtScript" value=1>
+                {% if existsLabel == "yes"%}
+                <select name="true_false" id="true_false">
+                    <option value="yes">Exists</option>
+                    <option value="no">Doesn't Exist</option>
+                {% else %}
+                <select name="true_false" id="true_false">
+                    <option value="no">Doesn't Exist</option>
+                    <option value="yes">Exists</option>
+                {% endif %}
+                </select>
+
                 <label for="key">Field:</label>
                 <select name="key" id="key">
+                    {% if keyLabel != ""%}
+                    <option value='{{keyLabel}}'>--{{keyLabel}}--</option>
+                    {% endif %}
+
                     <option value="none">None</option>
+                    <option value="Name">Name</option>
                     <option value="type">Type</option>
+                    <option value="unicode">Unicode</option>
                     <option value="family">Family</option>
                     <option value="direction">Direction</option>
                     <option value="glyphNumber">Number of Glyphs</option>
+                    <option value="diacritics">Diacritics</option>
+                    <option value="contextualForms">Contextual Forms</option>
                     <option value="capitalUsed">Use Capitals</option>
                     <option value="earliestDate">Earliest Attestation Date</option>
                     <option value="latestDate">Latest Attestation Date</option>
                     <option value="earliestLoc">Earliest Attestation Location</option>
+                    <option value="inventor">Inventor</option>
                     <option value="parent">Parentage</option>
                     <option value="children">Development</option>
+                    <option value="countries">Official Status</option>
+                    <option value="languages">Languages</option>
                     <option value="description">Description</option>
                     <option value="Hyperlinks">Hyperlinks</option>
-                    
                 </select>
 
                 <label for= "value"> Value: </label>
+                {% if valueLabel != ""%}
+                <input type="text" id="value" name="value" value="{{valueLabel}}"><br><br>
+                {% else %}
                 <input type="text" id="value" name="value"><br><br>
+                {% endif %}
                 <input type='submit' value="Filter">
+                <a href="{{url_for("main")}}"><button type="button">Clear Filter</button></a>
             </form>
+
+        <hr>
+
+        <H3>Uncompleted Scripts:</H3>
 
             <Table border=1 style="width:70%">
                 {% for s in uncertScripts %}
@@ -44,6 +80,8 @@
                     <td><a href={{url_for("main", delKey=key, keyScript=s['Name'])}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td></tr>
                 {% endfor %}
             </table>
+
+        <hr>
 
         <H3>Completed Scripts:</H3>
             <Table border=1 style="width:70%">
@@ -54,6 +92,8 @@
                 {% endfor %}
             </table>
 
+        <hr>
+
         <H3>Bibliography:</H3>
             <Table border=1 style="width:60%">
             <tr>
@@ -63,6 +103,7 @@
                 <th>Chapter</th>
                 <th>Pages</th>
                 <th>Publisher</th>
+                <th>URL</th>
                 <th>Script</th>
             </tr>
             {% for dic in bib_dic %}
@@ -73,6 +114,7 @@
                 <td>{{dic["chapter"]}}</td>
                 <td>{{dic["pages"]}}</td>
                 <td>{{dic["publisher"]}}</td>
+                <td>{{dic["url"]}}</td>
                 <td><a href={{url_for("scriptEdit", scr=dic['script'])}}>{{dic['script']}}</a></td>
             </tr>
         {% endfor %}

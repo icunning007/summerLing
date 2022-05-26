@@ -97,6 +97,7 @@ def main():
 
     #code for displaying existing skripts
     certScripts = []
+    oneTwo = {}
     uncertScripts = []
     scriptCertTF = {}
 
@@ -108,13 +109,27 @@ def main():
             print(name['Name'])
             cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
             cert = cert['ignore_certified']
+            scriptCertTF[str(name['Name'])] = cert 
             if(cert==1):
                 certScripts.append(name)
+
             else:
                 uncertScripts.append(name)
+                cert1 = db.collections.count_documents({"Name" : name['Name'], "ignore_certNum1" : {"$exists" : True}})
+                cert2 = db.collections.count_documents({"Name" : name['Name'], "ignore_certNum2" : {"$exists" : True}})
+                cert1 = int(cert1)
+                cert2 = int(cert2)
+                name= name['Name']
+                print(cert1, cert2)
+                if cert1>0 and cert2>0:
+                    oneTwo[name] = "both"
+                elif cert1>0 and cert2==0:
+                    oneTwo[name] = 'one'
+                elif cert1==0 and cert2>0:
+                    oneTwo[name] = 'two'
+                elif cert1==0 and cert2==0:
+                    oneTwo[name] = 'neither'
 
-            name = str(name['Name'])
-            scriptCertTF[name] = cert 
     
     allScripts = db.collections.find()                     #get all the scripts
     allScripts = allScripts.sort([("Name", ASCENDING)])    #sort them in alphabetical order
@@ -137,8 +152,10 @@ def main():
 
     print(scriptCertTF)
 
+    print(oneTwo)
+
     mongo_client.close()                                    #closes the database
-    return render_template("basic.html", valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
+    return render_template("basic.html", oneTwo=oneTwo, valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
     
 '''code for editing an individual script'''
 @mysubsite.route("/script", methods=['GET', 'POST'])
@@ -174,23 +191,22 @@ def scriptEdit():
     if "bibName" in request.args:
         name = request.args['bibName']
         mash = str(name) + "_bibliography"
-        publisher = request.args['publisher']
-        print("|", publisher, "|")
+        print("|", mash, "|")
         query = {}
-        
-        if request.args['author']:
+
+        if 'author' in request.args:
             query['author'] = request.args['author']
-        if request.args['year']:
+        if 'year' in request.args:
             query['year'] = request.args['year']
-        if request.args['book']:
+        if 'book' in request.args:
             query['book'] = request.args['book']
-        if request.args['chapter']:
+        if 'chapter' in request.args:
             query['chapter'] = request.args['chapter']
-        if request.args['pages']:
+        if 'pages' in request.args:
             query['pages'] = request.args['pages']
-        if request.args['publisher']:
+        if 'publisher' in request.args:
             query['publisher'] = request.args['publisher']
-        if request.args['url']:
+        if 'url' in request.args:
             query['url'] = request.args['url']
 
         db.collections.update_one({"Name" : mash}, {"$pull" : {"Sources" : query}})
@@ -284,11 +300,16 @@ def scriptEdit():
                 bib_true = 1
                 bib_dic.append(val)
         
-
+        startScript = ''
+        exists = db.collections.count_documents({"Name" : name, "ignore_startedScript" : {"$exists" : True}})
+        if exists > 0:
+            startScript = db.collections.find({"Name" : name, "ignore_startedScript" : {"$exists" : True}})
+            startScript = startScript[0]['ignore_startedScript']
+           # for s in startScript:
 
         mongo_client.close()
 
-        return render_template("scriptEdit.html", bib_true=bib_true, bib_dic=bib_dic, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
+        return render_template("scriptEdit.html", startScript=startScript, bib_true=bib_true, bib_dic=bib_dic, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
    
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
@@ -348,7 +369,21 @@ def scriptEdit():
         else:
             mongo_client.close()                    #closes database
             return redirect(url_for("scriptEdit",scr=name, msg=f"{val} already exists!"))
-   
+  
+    elif "madeScript1" in request.form:
+        name = request.form['Name']
+        val = request.form['madeScript1']
+        db.collections.update_one({"Name":name}, {"$set": {"ignore_startedScript": val}})
+        mongo_client.close()
+        return redirect(url_for("scriptEdit",scr=name, msg=f"{val} started {name}!"))
+    elif "madeScript" in request.form:
+        name = request.form['Name']
+        val = request.form['madeScript']
+        db.collections.update_one({"Name":name}, {"$unset":{"ignore_startedScript" : val}})
+        mongo_client.close()
+        return redirect(url_for("scriptEdit",scr=name))
+
+
     #All the certifications are to make sure that the people working on the research
     #have all the information they want to have in it + it's been checked
     #only after that it will be published

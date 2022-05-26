@@ -76,7 +76,16 @@
             <Table border=1 style="width:70%">
                 {% for s in uncertScripts %}
                     <tr><td style="width:80%"><b><a href={{url_for('scriptEdit', scr=s['Name'])}}>{{s['Name']}}</a></b></td>
+                    {% if oneTwo[s['Name']] == 'neither' %}
                     <td><span style="color:red">&#10060;</span></td>
+                    <td><span style="color:red">&#10060;</span></td>
+                    {% elif oneTwo[s['Name']] == 'one' %}
+                    <td><span style="color:green">&#10003;</span></td>
+                    <td><span style="color:red">&#10060;</span></td>
+                    {% elif oneTwo[s['Name']] == 'two' %}
+                    <td><span style="color:red">&#10060;</span></td>
+                    <td><span style="color:green">&#10003;</span></td>
+                    {% endif %}
                     <td><a href={{url_for("main", delKey=key, keyScript=s['Name'])}} onclick="return confirm('Are you sure you want to delete?')">DELETE</a></td></tr>
                 {% endfor %}
             </table>

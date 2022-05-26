@@ -14,6 +14,24 @@
         {% endif %}
     
     <form method=POST>
+    {% if startScript!= '' %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <input type="hidden" id="madeScript" name="madeScript" value="{{startScript}}">
+    <label for="madeScript">Who started inputing this Script: {{startScript}} &emsp;</label>
+    <input type="submit" value="Change"><br>
+    </form>
+    {% else %}
+    <form method=POST>
+    <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+    <label for="madeScript1">Who started inputing this Script: </label>
+    <input type="text" id="madeScript1" name="madeScript1"/>
+    <input type="submit" value="Submit"><br>
+    </form>
+    {% endif %}
+
+
+    <form method=POST>
     <table border=1>
     
     <tr><th>Name</th>

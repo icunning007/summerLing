@@ -13,6 +13,8 @@
         <input type="submit" value="ADD SCRIPT">
         </form>
         <hr> 
+        <a href="{{url_for("example")}}"><button type="button">See Example</button></a>
+        <hr>
         <H4>Filter Scripts:</H4>
         <p>To check for a script that has ___ field, use "Exists", to find the one's missing ___ field use "Doesn't Exist" <br> 
         &ensp; if you leave the value blank it will search for only the field but it you put a word/number in value it will search <br>
@@ -69,6 +71,8 @@
                 <a href="{{url_for("main")}}"><button type="button">Clear Filter</button></a>
             </form>
 
+            <p>There's a total of {{totalNum}} scripts created.</p>
+
         <hr>
 
         <H3>Uncompleted Scripts:</H3>
@@ -115,7 +119,7 @@
                 <th>URL</th>
                 <th>Script</th>
             </tr>
-            {% for dic in bib_dic %}
+        {% for dic in bib_dic %}
             <tr>
                 <td>{{dic["author"]}}</td>
                 <td>{{dic["year"]}}</td>

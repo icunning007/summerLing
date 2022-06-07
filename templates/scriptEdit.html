@@ -112,6 +112,31 @@
         </td>
         {% endif %}
     
+    <tr><th>Unicode Code Chart
+    </th>
+        {% if "unicodeChart" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['unicodeChart'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="unicodeChart_{{v}}" rows="1" 
+                    name="unicodeChart_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="unicodeChart", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="unicodeChart" rows="1" name="unicodeChart"></textarea>
+        </td>
+        {% endif %}
+    
     <tr><th>Direction</th>
         {% if "direction" in dic.keys() %}
         <td>
@@ -500,10 +525,60 @@
         </td>
         {% else %}
         <td>
-            <textarea type="text" style="width: 423px;" id="inventor" rows="1" name="inventor"></textarea>
+            <textarea type="text" style="width: 423px;" id="imageAddress" rows="1" name="imageAddress"></textarea>
         </td>
         {% endif %}
     
+    <tr><th>Image Description
+    </th>
+        {% if "imageDescription" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['imageDescription'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="imageDescription_{{v}}" rows="1" 
+                    name="imageDescription_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="imageDescription", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="imageDescription" rows="1" name="imageDescription"></textarea>
+        </td>
+        {% endif %}
+    
+    <tr><th>Image Citation
+    </th>
+        {% if "imageCitation" in dic.keys() %}
+        <td>
+            <table border="1" style="width:50px">
+            {% for a in dic['imageCitation'] %}
+            {% for v in a %}
+            <tr>
+            <td>
+                <textarea type="text" style="width: 423px;" id="imageCitation_{{v}}" rows="1" 
+                    name="imageCitation_{{v}}" value="{{v}}"/>{{v}}</textarea>
+            </td>
+            <td>
+                <a href={{url_for("scriptEdit", val=v, delValue="imageCitation", valueName=scripts["Name"])}} 
+                    onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
+            </td></tr>
+            {% endfor %}{% endfor %}
+            </table>
+        </td>
+        {% else %}
+        <td>
+            <textarea type="text" style="width: 423px;" id="imageCitation" rows="1" name="imageCitation"></textarea>
+        </td>
+        {% endif %}
+
     <tr><th>Research Notes
     </th>
         {% if "researchNotes" in dic.keys() %}

@@ -2,10 +2,136 @@ from flask import request, redirect, url_for, session, current_app, session
 from flask import render_template
 from summer import mysubsite
 from pymongo import MongoClient, ASCENDING, DESCENDING
+import re
+
+@mysubsite.route("/advancedSearch", methods=['GET', 'POST'])
+def advancedSearch():
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client.worldScriptsUMW
+    collections= db.list_collection_names()
+    
+    if "searched" in request.form:
+        query = []
+        
+        query.append({"Name":{"$not": re.compile('bibliography')}})
+
+        if "Name" in request.form:
+            value = request.form['Name']
+            if value:
+                query.append({"Name":{"$regex":value, "$options":'i'}})
+        if "type" in request.form:
+            value = request.form['type']
+            if value:
+                query.append({"type":{"$regex":value, "$options":'i'}})
+            
+        print(query)
+        result = db.collections.find({"$and":query})
+        return render_template("results.html", result=result)
+
+            
+
+    return render_template("search.html")
+
+@mysubsite.route("/ISOcodes", methods=['GET', 'POST'])
+def ISOcodes():
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client.worldScriptsUMW
+    collections= db.list_collection_names()
+
+    ISO = []
+    find=''
+    name = ''
+    if "filterISO" in request.form:
+        name = request.form['search']
+        num = db.collections.count_documents({"Name" : "ISO.2", 'code2':name})
+        if num == 0:
+            find = "No"
+        else:
+            find = db.collections.find({"Name" : "ISO.2", 'code2':name}).next()
+        
+    iso = db.collections.find({"Name" : "ISO.2"})
+    for i in iso:
+        ISO.append(i)
+    return render_template("ISOcodes.html", iso=ISO, result=find, name=name)
+
+@mysubsite.route("/Results", methods=['GET', 'POST'])
+def Results():
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client.worldScriptsUMW
+    collections= db.list_collection_names()
+    search = request.args['search']
+    values = search.split(" ")
+    total = 0
+    query = []
+    for v in values:
+        query.append({"Name":{"$regex":v, "$options":'i'}})
+    nameResult = db.collections.find({"$and":query})
+    name = []
+    for n in nameResult:
+        if "bibliography" not in n['Name']:
+            total += 1
+            name.append(n)
+    nameTotal = len(name)
+    return render_template("results.html", name=name, total=total, nameTotal=nameTotal)
+
+@mysubsite.route("/about", methods=['GET', 'POST'])
+def about():
+    return render_template("about.html")
+
+@mysubsite.route("/ScriptDescription", methods=['GET', 'POST'])
+def ScriptDescription():
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client.worldScriptsUMW
+    collections= db.list_collection_names()
+    name = request.args["script"]
+    nameScripts = db.collections.find({"Name" : name}).next()                     #get all the scripts
+    return render_template("ScriptDescription.html", script=nameScripts)
 
 @mysubsite.route("/example", methods=['GET', 'POST'])
 def example():
-    return render_template("example.html")
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client.worldScriptsUMW
+    collections= db.list_collection_names()
+    if "search" in request.args:
+        search = request.args['search']
+        return redirect(url_for("Results", search=search))
+
+    nameScripts = db.collections.find()                     #get all the scripts
+    nameScripts = nameScripts.sort([("Name", ASCENDING)])   #sort them in alphabetical order
+    #code for displaying existing skripts
+    certScripts = []
+    alphabet = {}
+
+    bib_dic = []
+    bib_true = 0
+    totalNum = 0
+
+    for name in nameScripts:    #adds the name of scripts to a list
+        if "bibliography" not in name['Name'] and "ISO.2" not in name["Name"]:
+            cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
+            certScripts.append(name) 
+            totalNum += 1
+            key = name['Name'][0]
+            alphKeys = alphabet.keys()
+            if key not in alphKeys:
+                alphabet[key] = [name['Name']]
+            else:
+                alphabet[key].append(name['Name'])
+
+            '''cert = cert['ignore_certified']
+            if(cert==1):
+                print(name['Name'])
+                certScripts.append(name) '''
+        if "bibliography" in name["Name"] and "ISO.2" not in name['Name']:
+            script = str(name['Name']).split("_")
+            find = db.collections.find({"Name" : name['Name'], "Sources.0" : {"$exists" : True}})
+            for f in find:
+                for val in f['Sources']:
+                    bib_true = 1
+                    val['script'] = script[0]
+                    bib_dic.append(val)
+
+    return render_template("example.html", alphabet=alphabet, totalNum=totalNum, scripts=certScripts, bib_dic=bib_dic)
 
 @mysubsite.route("/", methods=['GET', 'POST'])
 def password():
@@ -68,7 +194,6 @@ def main():
         value = request.form['value']
         exists = request.form['true_false']
 
-        print(key)
         if key != "none" and exists == "yes":
             if value:
                 existsLabel = "yes"
@@ -100,13 +225,15 @@ def main():
     oneTwo = {}
     uncertScripts = []
     scriptCertTF = {}
+    totalNum =0
+
 
     bib_dic = []
     bib_true = 0
 
     for name in nameScripts:    #adds the name of scripts to a list
-        if "bibliography" not in name['Name']:
-            print(name['Name'])
+        if "bibliography" not in name['Name'] and "ISO.2" not in name['Name']:
+            totalNum += 1
             cert = db.collections.find({"Name" : name['Name']}, {'_id': False, "ignore_certified":1}).next()
             cert = cert['ignore_certified']
             scriptCertTF[str(name['Name'])] = cert 
@@ -120,7 +247,6 @@ def main():
                 cert1 = int(cert1)
                 cert2 = int(cert2)
                 name= name['Name']
-                print(cert1, cert2)
                 if cert1>0 and cert2>0:
                     oneTwo[name] = "both"
                 elif cert1>0 and cert2==0:
@@ -130,12 +256,14 @@ def main():
                 elif cert1==0 and cert2==0:
                     oneTwo[name] = 'neither'
 
-    
-    allScripts = db.collections.find()                     #get all the scripts
-    allScripts = allScripts.sort([("Name", ASCENDING)])    #sort them in alphabetical order
+    '''
+    allScripts = db.collections.find({"Name" : {"$regex" : 'bibliog', "$options": "i"}})                     #get all the scripts
+    allScripts = allScripts.sort([("Sources.author", ASCENDING)])    #sort them in alphabetical order
+    ''' 
+    allScripts = db.collections.aggregate([{"$project":{"_id":1 ,'Name':1, 'author' : "$Sources.author", "Sources":1}}, {"$unwind":"$author"}, {"$sort": {"author":1}}])
+
     for name in allScripts:
-        if "bibliography" in name["Name"]:
-            print(name['Name'])
+        if "bibliography" in name["Name"] and "ISO.2" not in name['Name']:
             script = str(name['Name']).split("_")
             find = db.collections.find({"Name" : name['Name'], "Sources.0" : {"$exists" : True}})
             for f in find:
@@ -150,12 +278,9 @@ def main():
     if 'msg' in request.args:
         msg = request.args['msg']
 
-    print(scriptCertTF)
-
-    print(oneTwo)
 
     mongo_client.close()                                    #closes the database
-    return render_template("basic.html", oneTwo=oneTwo, valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
+    return render_template("basic.html", totalNum=totalNum, oneTwo=oneTwo, valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
     
 '''code for editing an individual script'''
 @mysubsite.route("/script", methods=['GET', 'POST'])
@@ -250,7 +375,6 @@ def scriptEdit():
 
         
         #get all the data from the database for the script
-        print(name)
         ans = db.collections.find({"Name" : name}, {"_id":0}).next()
         filtered_data = {}
         filtered_dataList = {}
@@ -288,7 +412,6 @@ def scriptEdit():
 
 
         mash = str(name) + "_bibliography"
-        print(mash)
         ans = db.collections.count_documents({"Name" : mash})
         
         bib_dic = []
@@ -314,8 +437,12 @@ def scriptEdit():
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
         key=request.form['listkey']                 #gets key name
-        if "mages" in key:
+        if "ddress" in key:
             key = "imageAddress"
+        elif "mage" in key and "escription" in key:
+            key = "imageDescription"
+        elif "mage" in key and "itation" in key:
+            key = "imageCitation"
         elif "yperlinks" in key:
             key = "Hyperlinks"
         elif "escription" in key:
@@ -348,6 +475,8 @@ def scriptEdit():
             key = "direction"
         elif "nicode" in key:
             key = "unicode"
+        elif "nicode" in key and "art" in key:
+            key = "unicodeChart"
         elif "amily" in key:
             key = "family"
         elif "ype" in key:
@@ -454,7 +583,6 @@ def scriptEdit():
         two = {"$push" : {"Sources" : query}}
 
 
-        print("Here")
         
         db.collections.update_one(one, two)
         

@@ -1,3 +1,4 @@
+from datetime import date
 from flask import request, redirect, url_for, session, current_app, session
 from flask import render_template
 from summer import mysubsite
@@ -12,7 +13,7 @@ def advancedSearch():
     
     if "searched" in request.form:
         query = []
-        
+         
         query.append({"Name":{"$not": re.compile('bibliography')}})
 
         if "Name" in request.form:
@@ -23,10 +24,50 @@ def advancedSearch():
             value = request.form['type']
             if value:
                 query.append({"type":{"$regex":value, "$options":'i'}})
+        if "family" in request.form:
+            value = request.form['family']
+            if value:
+                query.append({"family":{"$regex":value, "$options":'i'}})
+        if "unicode" in request.form:
+            value = request.form['unicode']
+            if value:
+                query.append({"unicode":{"$regex":value, "$options":'i'}})
+        if "glyphNumber" in request.form:
+            value = request.form['glyphNumber']
+            if value:
+                query.append({"glyphNumber":{"$regex":value, "$options":'i'}})
+        if "diacritics" in request.form:
+            value = request.form['diacritics']
+            if value != "any":
+                query.append({"diacretics":{"$regex":value, "$options":'i'}})
+        if "contextualForms" in request.form:
+            value = request.form['contextualForms']
+            if value != "any":
+                query.append({"contextualForms":{"$regex":value, "$options":'i'}})
+        if "capitalUsed" in request.form:
+            value = request.form['capitalUsed']
+            if value != "any":
+                query.append({"capitalUsed":{"$regex":value, "$options":'i'}})
+        if "startDate" in request.form:
+            currentYear = date.today().year
+            
+            value = request.form['startDate']
+            if value:
+                query.append({"earliestDate":{"$regex":value, "$options":'i'}})
+        if "countries" in request.form:
+            value = request.form['countries']
+            if value:
+                query.append({"countries":{"$regex":value, "$options":'i'}})
+        if "languages" in request.form:
+            value = request.form['languages']
+            if value:
+                query.append({"languages":{"$regex":value, "$options":'i'}})
             
         print(query)
         result = db.collections.find({"$and":query})
-        return render_template("results.html", result=result)
+        total = db.collections.count_documents({"$and":query})
+ 
+        return render_template("results.html", total=total, result=result)
 
             
 

@@ -608,6 +608,23 @@
     <input type="submit" value="Make changes!" />
     </form>
 
+    <h4>Add an image:</h4>
+    <p> - Add the image information (description, and citation) in the above boxes</p>
+    <p> - If you want to change the image, simply re-upload one.</p>
+    {% if "imageName" in scripts.keys() %}
+        <p style='color:red;'>There is already an image for this script: <i>**ignore: {{scripts['imageName']}}**</i><br></p>
+        <img src="../static/uploads/{{scripts['imageName']}}" style="width:200px;max-height:150px;">
+        <br>
+    {% endif %}
+    <br>
+    <form action='/script' method='POST' enctype = "multipart/form-data" >
+        <input type="hidden" id="Name" name="Name" value="{{scripts.Name}}">
+        <input id="file" type="file" name="file" />
+        <button type='submit'> Upload </button>
+    </form>
+
+    <br>
+
     <H4> OR add to an <b>existing</b> or <b>new</b> key/value: </H4>
     <p style="font-size: 12px;">**Please use the same key as the field you're trying to add to, otherwise it wont update correctly. <br> You can omit the parts in parentheses </p>
     <form method=POST>

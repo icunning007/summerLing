@@ -1,40 +1,48 @@
 from datetime import date
-from flask import request, redirect, url_for, session, current_app, session
+from flask import request, redirect, url_for, session, current_app, session, jsonify
 from flask import render_template
 from summer import mysubsite
 from pymongo import MongoClient, ASCENDING, DESCENDING
 import re
+import os.path
+import os
 
 @mysubsite.route("/advancedSearch", methods=['GET', 'POST'])
 def advancedSearch():
     mongo_client = MongoClient("mongodb://localhost:27017")
     db = mongo_client.worldScriptsUMW
     collections= db.list_collection_names()
-    
+
     if "searched" in request.form:
+        searchItems = []
         query = []
-         
+        print(request.form) 
         query.append({"Name":{"$not": re.compile('bibliography')}})
 
         if "Name" in request.form:
             value = request.form['Name']
             if value:
+                searchItems.append(value.title())
                 query.append({"Name":{"$regex":value, "$options":'i'}})
         if "type" in request.form:
             value = request.form['type']
             if value:
+                searchItems.append(value.title())
                 query.append({"type":{"$regex":value, "$options":'i'}})
         if "family" in request.form:
             value = request.form['family']
             if value:
+                searchItems.append(value.title())
                 query.append({"family":{"$regex":value, "$options":'i'}})
         if "unicode" in request.form:
             value = request.form['unicode']
             if value:
+                searchItems.append(value.title())
                 query.append({"unicode":{"$regex":value, "$options":'i'}})
         if "glyphNumber" in request.form:
             value = request.form['glyphNumber']
             if value:
+                searchItems.append(value.title())
                 query.append({"glyphNumber":{"$regex":value, "$options":'i'}})
         if "diacritics" in request.form:
             value = request.form['diacritics']
@@ -48,26 +56,61 @@ def advancedSearch():
             value = request.form['capitalUsed']
             if value != "any":
                 query.append({"capitalUsed":{"$regex":value, "$options":'i'}})
-        if "startDate" in request.form:
-            currentYear = date.today().year
-            
-            value = request.form['startDate']
-            if value:
-                query.append({"earliestDate":{"$regex":value, "$options":'i'}})
+        searchDate = request.form['startDate']
+        if searchDate:
+            current = date.today().year
+            start = int(request.form['startDate'])
+            cent = request.form['startCent']
+            if cent=='BCE':
+                mash = 'From ' + str(start) + ' BCE'
+                searchItems.append(mash)        
+                start = -+start
+            else:
+                mash = 'From ' + str(start) + ' CE'
+                searchItems.append(mash)
+            query.append({"searchEarlyDate":{'$gte':start}})
+            if "endDate" in request.form:
+                end = request.form['endDate']
+                if 'resent' in end:
+                    mash = 'To Present'
+                    searchItems.append(mash)
+                    query.append({'searchLateDate':{'$lte':current}})
+                else:
+                    end = int(end)
+                    cent = request.form['endCent']
+                    if 'BCE'==cent:
+                        mash = 'To ' + str(end) + ' BCE'
+                        searchItems.append(mash)
+                        end = -+end
+                    else:
+                        mash = 'To ' + str(end) + " CE"
+                        searchItems.append(mash)
+                    query.append({'searchLateDate':{'$lte':end}})
+            else:
+                query.append({'searchLateDate':{'$lte':current}})
         if "countries" in request.form:
             value = request.form['countries']
             if value:
+                searchItems.append(value.title())
                 query.append({"countries":{"$regex":value, "$options":'i'}})
         if "languages" in request.form:
             value = request.form['languages']
             if value:
+                searchItems.append(value.title())
                 query.append({"languages":{"$regex":value, "$options":'i'}})
             
         print(query)
         result = db.collections.find({"$and":query})
         total = db.collections.count_documents({"$and":query})
- 
-        return render_template("results.html", total=total, result=result)
+        totalString = ''
+        if total == 1:
+            totalString = 'There is 1 result'
+        else:
+            totalString = 'There are ' + str(total) + ' results'
+
+        search = ', '.join(searchItems)
+
+        return render_template("results.html", searchItems=search, total=totalString, result=result)
 
             
 
@@ -115,8 +158,12 @@ def Results():
     nameTotal = len(name)
     return render_template("results.html", name=name, total=total, nameTotal=nameTotal)
 
+
 @mysubsite.route("/about", methods=['GET', 'POST'])
 def about():
+
+    
+
     return render_template("about.html")
 
 @mysubsite.route("/ScriptDescription", methods=['GET', 'POST'])
@@ -126,7 +173,7 @@ def ScriptDescription():
     collections= db.list_collection_names()
     name = request.args["script"]
     nameScripts = db.collections.find({"Name" : name}).next()                     #get all the scripts
-    return render_template("ScriptDescription.html", script=nameScripts)
+    return render_template("ScriptDescription1.html", script=nameScripts)
 
 @mysubsite.route("/example", methods=['GET', 'POST'])
 def example():
@@ -172,7 +219,7 @@ def example():
                     val['script'] = script[0]
                     bib_dic.append(val)
 
-    return render_template("example.html", alphabet=alphabet, totalNum=totalNum, scripts=certScripts, bib_dic=bib_dic)
+    return render_template("example1.html", alphabet=alphabet, totalNum=totalNum, scripts=certScripts, bib_dic=bib_dic)
 
 @mysubsite.route("/", methods=['GET', 'POST'])
 def password():
@@ -323,6 +370,8 @@ def main():
     mongo_client.close()                                    #closes the database
     return render_template("basic.html", totalNum=totalNum, oneTwo=oneTwo, valueLabel=valueLabel, keyLabel=keyLabel, existsLabel=existsLabel, bib_true=bib_true, bib_dic=bib_dic, msg=msg, scriptCertTF=scriptCertTF, certScripts=certScripts, uncertScripts=uncertScripts)
     
+mysubsite.config['IMAGE_UPLOADS'] = '/home/ise_m_cunningham2001/summer/static/uploads'
+
 '''code for editing an individual script'''
 @mysubsite.route("/script", methods=['GET', 'POST'])
 def scriptEdit():
@@ -474,7 +523,9 @@ def scriptEdit():
         mongo_client.close()
 
         return render_template("scriptEdit.html", startScript=startScript, bib_true=bib_true, bib_dic=bib_dic, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
-   
+  
+
+
     #code for adding a new key/value pair
     elif "listkey" in request.form:                
         key=request.form['listkey']                 #gets key name
@@ -553,6 +604,40 @@ def scriptEdit():
         mongo_client.close()
         return redirect(url_for("scriptEdit",scr=name))
 
+    #code for uploading image to script
+    elif request.files:
+            image = request.files['file']
+            
+            name = request.form['Name']
+            imageName = name.replace(' ', '-')
+            iname = str(image.filename)
+            n = iname.split('.')
+            mash = imageName + '[0[.' + n[1]
+            
+            #db.collections.update_one({'Name':name},{'$unset':{'imageName':''}})
+            
+            oldName = db.collections.find({'Name':name}).next()
+            if 'imageName' in oldName.keys():
+                db.collections.update_one({'Name':name},{'$unset':{'imageName':''}})
+                path = './static/uploads/' + oldName['imageName']
+                os.remove(path)
+                oName = oldName['imageName'].split('[')
+                print(oName)
+                curName = oName[0]
+                num = int(oName[1])
+                end = oName[2]
+                newNum = num + 1
+                mash = curName + '[' + str(newNum) + '[' + end
+                image.save(os.path.join(mysubsite.config['IMAGE_UPLOADS'], mash))
+                db.collections.update_one({'Name':name},{'$set':{'imageName':mash}})
+            else:
+                path = "./static/uploads/" + mash
+                db.collections.update_one({'Name':name},{'$set':{'imageName':mash}})
+                image.save(os.path.join(mysubsite.config['IMAGE_UPLOADS'], mash))
+            print('image saved')
+            
+
+            return redirect(url_for("scriptEdit",scr=name))
 
     #All the certifications are to make sure that the people working on the research
     #have all the information they want to have in it + it's been checked

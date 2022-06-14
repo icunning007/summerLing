@@ -42,12 +42,17 @@ def advancedSearch():
         if "glyphNumber" in request.form:
             value = request.form['glyphNumber']
             if value:
-                searchItems.append(value.title())
-                query.append({"glyphNumber":{"$regex":value, "$options":'i'}})
+                mash = ">" + value + ' glyphs'
+                searchItems.append(mash)
+                val = int(value)
+                query.append({"numGlyph":{"$gte":val}})
         if "diacritics" in request.form:
             value = request.form['diacritics']
+            print('DIIIII '+value)
             if value != "any":
-                query.append({"diacretics":{"$regex":value, "$options":'i'}})
+                mash = value.title() + ' diacritics'
+                searchItems.append(mash)
+                query.append({"diacritics":{"$regex":value, "$options":'i'}})
         if "contextualForms" in request.form:
             value = request.form['contextualForms']
             if value != "any":
@@ -101,16 +106,18 @@ def advancedSearch():
             
         print(query)
         result = db.collections.find({"$and":query})
+        result = result.sort([("Name", ASCENDING)])   #sort them in alphabetical order
+        grandTotal = db.collections.count_documents({'$and':[{"Name":{"$not":re.compile('bibliography')}}, {'Name':{'$not':re.compile('ISO.2')}}]})
         total = db.collections.count_documents({"$and":query})
         totalString = ''
         if total == 1:
-            totalString = 'There is 1 result'
+            totalString = 'There is 1/'+ str(grandTotal)+ ' scripts that match your search'
         else:
-            totalString = 'There are ' + str(total) + ' results'
+            totalString = 'There are ' + str(total)+"/"+ str(grandTotal) + ' scripts that match your search'
 
         search = ', '.join(searchItems)
 
-        return render_template("results.html", searchItems=search, total=totalString, result=result)
+        return render_template("results.html", grandTotal=grandTotal, searchItems=search, total=totalString, result=result)
 
             
 

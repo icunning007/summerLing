@@ -39,6 +39,11 @@ def advancedSearch():
             if value:
                 searchItems.append(value.title())
                 query.append({"unicode":{"$regex":value, "$options":'i'}})
+        if "inventor" in request.form:
+            value = request.form['inventor']
+            if value:
+                searchItems.append(value.title())
+                query.append({"inventor":{"$regex":value, "$options":'i'}})
         if "glyphNumber" in request.form:
             value = request.form['glyphNumber']
             if value:
@@ -74,7 +79,8 @@ def advancedSearch():
                 mash = 'From ' + str(start) + ' CE'
                 searchItems.append(mash)
             query.append({"searchEarlyDate":{'$gte':start}})
-            if "endDate" in request.form:
+            if 'endDate' in request.form:
+                current = date.today().year
                 end = request.form['endDate']
                 if 'resent' in end:
                     mash = 'To Present'
@@ -92,6 +98,7 @@ def advancedSearch():
                         searchItems.append(mash)
                     query.append({'searchLateDate':{'$lte':end}})
             else:
+                current = date.today().year
                 query.append({'searchLateDate':{'$lte':current}})
         if "countries" in request.form:
             value = request.form['countries']
@@ -125,6 +132,7 @@ def advancedSearch():
 
 @mysubsite.route("/ISOcodes", methods=['GET', 'POST'])
 def ISOcodes():
+
     mongo_client = MongoClient("mongodb://localhost:27017")
     db = mongo_client.worldScriptsUMW
     collections= db.list_collection_names()
@@ -168,9 +176,6 @@ def Results():
 
 @mysubsite.route("/about", methods=['GET', 'POST'])
 def about():
-
-    
-
     return render_template("about.html")
 
 @mysubsite.route("/ScriptDescription", methods=['GET', 'POST'])
@@ -179,8 +184,10 @@ def ScriptDescription():
     db = mongo_client.worldScriptsUMW
     collections= db.list_collection_names()
     name = request.args["script"]
-    nameScripts = db.collections.find({"Name" : name}).next()                     #get all the scripts
-    return render_template("ScriptDescription1.html", script=nameScripts)
+    nameScripts = db.collections.find({"Name" : name}).next()   
+    #get all the scripts
+    bib = db.collections.aggregate([{'$match':{'Name':"Grand_bibliography"}},{'$unwind':'$Sources'},{'$match':{'Sources.scriptName':name}}])
+    return render_template("ScriptDescription1.html", bib=bib, script=nameScripts)
 
 @mysubsite.route("/example", methods=['GET', 'POST'])
 def example():
@@ -260,9 +267,6 @@ def main():
         if exist == 0:
             db.collections.insert_one({'Name' : name})
             db.collections.update_one({"Name" : name}, {"$set" : {"ignore_certified": 0}})
-            mash = str(name) + "_bibliography"
-            db.collections.insert_one({
-                                    "Name" : mash, "Sources" : []})
             #set certified as false so it only happens once
 
         else:
@@ -273,8 +277,6 @@ def main():
         name = request.args['keyScript']
         key = request.args['delKey']
         db.collections.delete_one({"Name":name})
-        mash = str(name) + "_bibliography"
-        db.collections.delete_one({"Name":mash})
         mongo_client.close()
         return redirect(url_for("main",scr=name, msg=f"{key} deleted from {name} successfully!"))
 
@@ -431,7 +433,9 @@ def scriptEdit():
         if 'url' in request.args:
             query['url'] = request.args['url']
 
-        db.collections.update_one({"Name" : mash}, {"$pull" : {"Sources" : query}})
+        query['scriptName'] = name
+
+        db.collections.update_one({"Name" : 'Grand_bibliography'}, {"$pull" : {"Sources" : query}})
 
         return redirect(url_for("scriptEdit",scr=name, msg=f"Source deleted from {name} successfully!"))
 
@@ -508,18 +512,17 @@ def scriptEdit():
         
 
 
-        mash = str(name) + "_bibliography"
-        ans = db.collections.count_documents({"Name" : mash})
         
-        bib_dic = []
-        bib_true = 0
 
-        find = db.collections.find({"Name" : mash, "Sources.0" : {"$exists" : True}})
+        find = db.collections.aggregate([{'$match':{'Name':"Grand_bibliography"}},{'$unwind':'$Sources'},{'$match':{'Sources.scriptName':name}}])
+
+        #find = db.collections.find({"Name" : mash, "Sources.0" : {"$exists" : True}})
+        '''
         for f in find:
             for val in f['Sources']:
                 bib_true = 1
                 bib_dic.append(val)
-        
+        '''
         startScript = ''
         exists = db.collections.count_documents({"Name" : name, "ignore_startedScript" : {"$exists" : True}})
         if exists > 0:
@@ -529,7 +532,7 @@ def scriptEdit():
 
         mongo_client.close()
 
-        return render_template("scriptEdit.html", startScript=startScript, bib_true=bib_true, bib_dic=bib_dic, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
+        return render_template("scriptEdit.html", startScript=startScript, bib_dic=find, certTF=certTF, certNum1=certNum1, certNum2=certNum2, tf=true_false, dic=filtered_dataList, keys = keys, scripts=filtered_data, msg=msg)
   
 
 
@@ -711,16 +714,23 @@ def scriptEdit():
         if 'url' in request.form:
             url = request.form['url']
             query['url'] = str(url)
-
-        one = {"Name" : mashName}
-        two = {"$push" : {"Sources" : query}}
-
-
         
-        db.collections.update_one(one, two)
-        
+        true = 1
+        for k in query.keys():
+            if not query[k]:
+                true = 0
+
+        msg = ''
+
+        if true == 1:
+            one = {"Name" : 'Grand_biblography'}
+            two = {"$push" : {"Sources" : query}}
+            db.collections.update_one(one, two)
+            msg = 'Source added!'
+        else:
+            msg = 'Invalid Source'
         mongo_client.close()                    #closes database
-        return redirect(url_for("scriptEdit",scr=name, msg=f"Source added!"))
+        return redirect(url_for("scriptEdit",scr=name, msg=msg))
 
 
     #for make changes portion

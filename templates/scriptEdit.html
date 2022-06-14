@@ -640,7 +640,6 @@
 
     <H3>Bibliography: </H3>
 
-    {% if bib_true==1 %}
     <table border=1>
         <tr>
             <th>Author</th>
@@ -653,13 +652,13 @@
         </tr>
         {% for dic in bib_dic %}
             <tr>
-            <td>{{dic["author"]}}</td>
-            <td>{{dic["year"]}}</td>
-            <td>{{dic["book"]}}</td>
-            <td>{{dic["chapter"]}}</td>
-            <td>{{dic["pages"]}}</td>
-            <td>{{dic["publisher"]}}</td>
-            <td>{{dic["url"]}}</td>
+            <td>{{dic['Sources']["author"]}}</td>
+            <td>{{dic['Sources']["year"]}}</td>
+            <td>{{dic['Sources']["book"]}}</td>
+            <td>{{dic['Sources']["chapter"]}}</td>
+            <td>{{dic['Sources']["pages"]}}</td>
+            <td>{{dic['Sources']["publisher"]}}</td>
+            <td>{{dic['Sources']["url"]}}</td>
             <td>
                 <a href={{url_for("scriptEdit", author=dic['author'], year=dic['year'], book=dic['book'], chapter=dic['chapter'], pages=dic['pages'], publisher=dic['publisher'], bibName=scripts["Name"])}} 
                     onclick="return confirm('Are you sure you want to delete?')">DELETE</a>
@@ -669,7 +668,6 @@
 
 
     </table>
-    {% endif %}
 
 
     <p><b>Text Sources~ </b></p>
